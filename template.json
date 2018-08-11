@@ -130,15 +130,35 @@
             "kind": "functionapp",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Web/sites', variables('websiteName'))]"
             ],
             "properties": {
                 "serverFarmId": "[variables('appServicePlanName')]",
                 "siteConfig": {
-                    "alwaysOn": true
+                    "alwaysOn": true,
+                    "appSettings": [
+                        {
+                            "name": "baseballstats_STORAGE",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2018-02-01').keys[0].value)]"
+                        }
+                    ]
                 },
-                "httpsOnly": true
+                "httpsOnly": true,
+                "cors": {
+                    "allowedOrigins": "[reference(concat('Microsoft.Web/sites/', variables('websiteName')), '2016-08-01').hostNames]"
+                }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "websiteHostNames": {
+            "type": "array",
+            "value": "[reference(concat('Microsoft.Web/sites/', variables('websiteName')), '2016-08-01').hostNames]"
+        },
+        "apiHostNames": {
+            "type": "array",
+            "value": "[reference(concat('Microsoft.Web/sites/', variables('functionAppName')), '2016-08-01').hostNames]"
+        }
+    }
 }
