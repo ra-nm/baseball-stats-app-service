@@ -1,0 +1,144 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "costCenter": {
+            "type": "string",
+            "metadata": {
+                "description": "The value for the cost center tag on each resource."
+            }
+        },
+        "applicationName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Application"
+            },
+            "maxLength": 21
+        },
+        "storageAccountType": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_RAGRS"
+            ],
+            "metadata": {
+                "description": "The type of Azure Storage Account to deploy."
+            }
+        },
+        "appServicePlanSize": {
+            "type": "string",
+            "allowedValues": [
+                "B1",
+                "B2",
+                "B3",
+                "S1",
+                "S2",
+                "S3"
+            ],
+            "metadata": {
+                "description": "The size of the App Service Plan."
+            }
+        },
+        "appServicePlanCapacity": {
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 10,
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Capacity (number of VMs) of the App Service Plan."
+            }
+        }
+    },
+    "variables": {
+        "singleQuote": "'",
+        "storageAccountName": "[replace(replace(toLower(parameters('applicationName')), ' ', ''), variables('singleQuote'), '')]",
+        "appServicePlanName": "[concat(replace(replace(parameters('applicationName'), ' ', ''), variables('singleQuote'), ''), '-plan')]",
+        "websiteName": "[concat(replace(replace(parameters('applicationName'), ' ', ''), variables('singleQuote'), ''), '-web')]",
+        "functionAppName": "[concat(replace(replace(parameters('applicationName'), ' ', ''), variables('singleQuote'), ''), '-api')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "tags": {
+                "Cost Center": "[parameters('costCenter')]"
+            },
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[parameters('storageAccountType')]"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "encryption": {
+                    "keySource": "Microsoft.Storage",
+                    "services": {
+                        "blob": {
+                            "enabled": true
+                        },
+                        "file": {
+                            "enabled": true
+                        }
+                    }
+                },
+                "supportsHttpsTrafficOnly": true
+            }
+        },
+        {
+            "apiVersion": "2016-09-01",
+            "name": "[variables('appServicePlanName')]",
+            "tags": {
+                "Cost Center": "[parameters('costCenter')]"
+            },
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[variables('appServicePlanName')]"
+            },
+            "sku": {
+                "name": "[parameters('appServicePlanSize')]",
+                "capacity": "[parameters('appServicePlanCapacity')]"
+            }
+        },
+        {
+            "apiVersion": "2016-08-01",
+            "name": "[variables('websiteName')]",
+            "tags": {
+                "Cost Center": "[parameters('costCenter')]"
+            },
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[variables('appServicePlanName')]",
+                "siteConfig": {
+                    "alwaysOn": true
+                },
+                "httpsOnly": true
+            }
+        },
+        {
+            "apiVersion": "2016-08-01",
+            "name": "[variables('functionAppName')]",
+            "tags": {
+                "Cost Center": "[parameters('costCenter')]"
+            },
+            "type": "Microsoft.Web/sites",
+            "kind": "functionapp",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[variables('appServicePlanName')]",
+                "siteConfig": {
+                    "alwaysOn": true
+                },
+                "httpsOnly": true
+            }
+        }
+    ]
+}
