@@ -142,16 +142,22 @@
                             "name": "baseballstats_STORAGE",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2018-02-01').keys[0].value)]"
                         }
-                    ]
+                    ],
+                    "cors": {
+                        "allowedOrigins": [
+                            "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('websiteName')), '2016-08-01').defaultHostName)]"
+                        ]
+                    }
                 },
-                "httpsOnly": true,
-                "cors": {
-                    "allowedOrigins": "[reference(concat('Microsoft.Web/sites/', variables('websiteName')), '2016-08-01').hostNames]"
-                }
+                "httpsOnly": true
             }
         }
     ],
     "outputs": {
+        "websiteDefaultHostName": {
+            "type": "string",
+            "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('websiteName')), '2016-08-01').defaultHostName)]"
+        },
         "websiteHostNames": {
             "type": "array",
             "value": "[reference(concat('Microsoft.Web/sites/', variables('websiteName')), '2016-08-01').hostNames]"

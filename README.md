@@ -40,5 +40,5 @@ To deploy the template, run a command similar to the following from the root of 
 
 
 Notes: 
-* This tempate adds a connection string as an AppSetting in the Function App to access Azure Storage.
-* Due to this issue, https://github.com/Azure/azure-cli/issues/5814, the CORS settings in the template are ignored, so the web app domain needs to be added to the CORS list after deploying the function app.
+* This template adds a connection string as an AppSetting in the Function App to access Azure Storage.
+* This template adds an entry into the CORS settings to allow the web app to call the function app using javascript.
