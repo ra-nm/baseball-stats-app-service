@@ -13,6 +13,14 @@
         },
         "appServicePlanSize": {
             "value": "B1"
+        },
+        "websiteGitHubRepoUrl":
+        {
+            "value": "https://github.com/ra-nm/baseball-stats-web"
+        },
+        "apiGitHubRepoUrl":
+        {
+            "value": "https://github.com/ra-nm/baseball-stats-api"
         }
     }
 }

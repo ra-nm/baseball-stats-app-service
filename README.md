@@ -29,6 +29,11 @@ az login
 |storageAccountType|string|The type of Azure Storage Account to deploy. Allowed values are "Standard_LRS", "Standard_GRS", and "Premium_LRS"|
 |appServicePlanSize|string|The size of the App Service Plan. Allowed values are "B1", "B2", "B3", "S1", "S2", and "S3".
 |appServicePlanCapacity|int|Capacity (number of VMs) of the App Service Plan. Allowed values range from 1-10.|
+|websiteGitHubRepoUrl|string|GitHub repo url for the website code.|
+|websiteGitHubBranch|string|Branch in the GitHub repo to use for continuous deployment of the website code. Default value: master|
+|apiGitHubRepoUrl|string|GitHub repo url for the api code.|
+|apiGitHubBranch|string|Branch in the GitHub repo to use for continuous deployment of the api code. Default Value: master|
+
 
 ### App Service Deployment
 

@@ -48,6 +48,32 @@
             "metadata": {
                 "description": "Capacity (number of VMs) of the App Service Plan."
             }
+        },
+        "websiteGitHubRepoUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "GitHub repo url for the website code."
+            }
+        },
+        "websiteGitHubBranch": {
+            "type": "string",
+            "metadata": {
+                "description": "Branch in the GitHub repo to use for continuous deployment of the website code."
+            },
+            "defaultValue": "master"
+        },
+        "apiGitHubRepoUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "GitHub repo url for the api code."
+            }
+        },
+        "apiGitHubBranch": {
+            "type": "string",
+            "metadata": {
+                "description": "Branch in the GitHub repo to use for continuous deployment of the api code."
+            },
+            "defaultValue": "master"
         }
     },
     "variables": {
@@ -118,7 +144,22 @@
                     "alwaysOn": true
                 },
                 "httpsOnly": true
-            }
+            },
+            "resources": [
+              {
+                "apiVersion": "2015-08-01",
+                "name": "web",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                  "[resourceId('Microsoft.Web/Sites', variables('websiteName'))]"
+                ],
+                "properties": {
+                  "RepoUrl": "[parameters('websiteGitHubRepoUrl')]",
+                  "branch": "[parameters('websiteGitHubBranch')]",
+                  "IsManualIntegration": true
+                }
+              }
+            ]
         },
         {
             "apiVersion": "2016-08-01",
@@ -150,7 +191,22 @@
                     }
                 },
                 "httpsOnly": true
-            }
+            },
+            "resources": [
+              {
+                "apiVersion": "2015-08-01",
+                "name": "web",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                  "[resourceId('Microsoft.Web/Sites', variables('functionAppName'))]"
+                ],
+                "properties": {
+                  "RepoUrl": "[parameters('apiGitHubRepoUrl')]",
+                  "branch": "[parameters('apiGitHubBranch')]",
+                  "IsManualIntegration": true
+                }
+              }
+            ]
         }
     ],
     "outputs": {
